@@ -64,46 +64,45 @@ const images = [
   },
 ];
 
-const gallery = document.querySelector('.gallery');
-images.forEach(image => {
-  const li = document.createElement('li');
-  const a = document.createElement('a');
-  const img = document.createElement('img');
-  li.classList.add('gallery-item');
-  img.setAttribute('src', image.preview);
-  img.setAttribute('data-source', image.original);
-  // img.dataset.add('src', image.original);
-  img.setAttribute('alt', image.description);
-  img.classList.add('gallery-image');
-  a.setAttribute('href', image.original);
-  a.classList.add('gallery-link');
-  a.appendChild(img);
-  li.appendChild(a);
-  gallery.appendChild(li)
-});
-gallery.addEventListener('click', e => {
-  e.preventDefault();
-  // console.log(e);
-  if (e.target.nodeName === 'IMG') {
-    // console.log(e.target);
-    // e.target.getAttribute('data-source');
-    console.log(e.target.getAttribute('data-source'));
+const galleryContainer = document.querySelector('.gallery');
 
-const instance = basicLightbox.create(`
-    <div class="modal">
-      <img src="${e.target.getAttribute('data-source')}" alt="${e.target.getAttribute('alt')}">
-    </div>
-`)
+const galleryItem = images
+  .map(
+    ({ preview, original, description }) => `
+  <li class="gallery-style">
+  <a class="gallery-link" href="${original}">
+    <img
+      class="gallery-image"
+      src="${preview}"
+      data-source="${original}"
+      alt="${description}"
+    />
+    </a>
+  </li>
+`
+  ).join('');
 
-    instance.show()
+galleryContainer.innerHTML = galleryItem;
 
-    document.addEventListener('keydown', e => {
-      console.log(e);
-      if (e.code === 'Escape') {
-        instance.close()
-      }
-    })
+galleryContainer.addEventListener('click', onGalleryClick);
 
-  };
+function onGalleryClick(event) {
+  event.preventDefault();
+  if (event.target.nodeName !== 'IMG') {
+    return;
+  }
 
-})
+  const largeImageURL = event.target.dataset.source;
+
+  const instance = basicLightbox.create(`
+    <img src="${largeImageURL}" width="1112" height="640" alt="${event.target.alt}" />
+  `);
+
+  instance.show();
+
+  document.addEventListener('keydown', (esc) => {
+    if (esc.key === 'Escape') {
+      instance.close();
+    }
+  });
+}

@@ -36,5 +36,4 @@ main {
 
 .gallery-link {
     width: 360px;
-    height: 300px;
-}
+    height: 300px; }
